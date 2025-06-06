@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 export async function resetPassword(
   request: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) {
   const resetPasswordBodySchema = z
     .object({

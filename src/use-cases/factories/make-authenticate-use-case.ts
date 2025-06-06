@@ -8,7 +8,7 @@ export function makeAuthenticateUseCase() {
     new PrismaAuthenticationAuditRepository()
   const authenticateUseCase = new AuthenticateUseCase(
     usersRepository,
-    authenticationAuditRepository,
+    authenticationAuditRepository
   )
 
   return authenticateUseCase

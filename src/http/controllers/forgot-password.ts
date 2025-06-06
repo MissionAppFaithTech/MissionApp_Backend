@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 export async function forgotPassword(
   request: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) {
   const { email } = z
     .object({

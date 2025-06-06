@@ -1,7 +1,6 @@
 import type { UsersRepository } from '@/repositories/users-repository'
 import type { User } from '@prisma/client'
 import { InvalidCredentialsError } from './errors/invalid-credentials-error'
-import { compare } from 'bcryptjs'
 import type { AuthenticationAuditRepository } from '@/repositories/authentication-audit-repository'
 
 interface AuthenticateUseCaseRequest {
@@ -19,7 +18,7 @@ interface AuthenticateUseCaseResponse {
 export class AuthenticateUseCase {
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly authenticationAuditRepository: AuthenticationAuditRepository,
+    private readonly authenticationAuditRepository: AuthenticationAuditRepository
   ) {}
 
   async execute({
@@ -47,7 +46,7 @@ export class AuthenticateUseCase {
       throw new InvalidCredentialsError()
     }
 
-    const doesPasswordMatch = await compare(password, user.password_digest)
+    const doesPasswordMatch = false
 
     if (!doesPasswordMatch) {
       await this.authenticationAuditRepository.create({

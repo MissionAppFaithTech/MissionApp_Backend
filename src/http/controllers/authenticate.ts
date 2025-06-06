@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 export async function authenticate(
   request: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ) {
   const authenticateBodySchema = z
     .object({
@@ -38,7 +38,7 @@ export async function authenticate(
         sign: {
           sub: user?.id,
         },
-      },
+      }
     )
 
     const refreshToken = await reply.jwtSign(
@@ -48,7 +48,7 @@ export async function authenticate(
           sub: user?.id,
           expiresIn: '7d',
         },
-      },
+      }
     )
 
     return await reply

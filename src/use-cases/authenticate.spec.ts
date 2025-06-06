@@ -17,7 +17,7 @@ describe('AuthenticateUseCase', () => {
 
     sut = new AuthenticateUseCase(
       inMemoryUsersRepository,
-      inMemoryAuthenticationAuditRepository,
+      inMemoryAuthenticationAuditRepository
     )
   })
 
@@ -43,7 +43,7 @@ describe('AuthenticateUseCase', () => {
         await sut.execute({
           email: 'johndoe@example.com',
           password: 'password',
-        }),
+        })
     ).rejects.toBeInstanceOf(InvalidCredentialsError)
   })
 
@@ -52,7 +52,7 @@ describe('AuthenticateUseCase', () => {
       sut.execute({
         email: 'invalid-johndoe@example.com',
         password: 'password',
-      }),
+      })
     ).rejects.toBeInstanceOf(InvalidCredentialsError)
 
     const auditAuthentication =
@@ -73,7 +73,7 @@ describe('AuthenticateUseCase', () => {
         await sut.execute({
           email: 'johndoe@example.com',
           password: 'invalid-password',
-        }),
+        })
     ).rejects.toBeInstanceOf(InvalidCredentialsError)
   })
 
@@ -88,7 +88,7 @@ describe('AuthenticateUseCase', () => {
       sut.execute({
         email: 'johndoe@example.com',
         password: 'invalid-password',
-      }),
+      })
     ).rejects.toBeInstanceOf(InvalidCredentialsError)
 
     const auditAuthentication =

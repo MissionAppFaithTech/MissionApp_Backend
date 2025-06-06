@@ -32,7 +32,7 @@ describe('RegisterUseCase', () => {
 
     const isPasswordCorrectHashed = await compare(
       'password',
-      user.password_digest,
+      user.password_digest
     )
 
     expect(isPasswordCorrectHashed).toBe(true)
@@ -53,7 +53,7 @@ describe('RegisterUseCase', () => {
           name: 'John Doe',
           email,
           password: 'password',
-        }),
+        })
     ).rejects.toBeInstanceOf(UserAlreadyExistsError)
   })
 })
