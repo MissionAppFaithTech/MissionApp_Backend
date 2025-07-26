@@ -17,7 +17,24 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/naming-convention": "off",
-    "@typescript-eslint/restrict-plus-operands": "off"
+    "@typescript-eslint/restrict-plus-operands": "off",
+    "semi": ["error", "never"],
+
+    // Ordena e agrupa imports:
+    "import/order": [
+      "warn",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          ["parent", "sibling", "index"]
+        ],
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ]
   }
 }
-
