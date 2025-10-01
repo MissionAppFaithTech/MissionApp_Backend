@@ -26,6 +26,16 @@ enum UserRole {
   NORMAL_USER
 }
 
+enum IdentityType {
+  CPF
+  PASSPORT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
 model AuthenticationAudit {
   id          Int                  @id @default(autoincrement())
   ip_address  String?
@@ -48,6 +58,7 @@ model User {
   profilePicture String?  @map("profile_picture")
   biography      String?
   role           UserRole @default(NORMAL_USER)
+  gender         Gender?
 
   // Cache para recuperação da quantidade de seguidores mais rápido:
   followersCount Int @default(0) @map("followers_count")
@@ -74,20 +85,54 @@ model User {
 }
 
 model Missionary {
-  id                Int      @id @default(autoincrement())
-  publicEmail       String?  @map("public_email")
-  publicPhoneNumber String?  @map("public_phone")
-  createdAt         DateTime @default(now()) @map("created_at")
+  id                Int           @id @default(autoincrement())
+  publicEmail       String?       @map("public_email")
+  publicPhoneNumber String?       @map("public_phone")
+  // status
+  identityType      IdentityType? @map("identity_type")
+  identityDocument  String?       @map("identity_document")
+  createdAt         DateTime      @default(now()) @map("created_at")
 
   missionaryAgencyId Int
-  MissionaryAgency   MissionaryAgency @relation(fields: [missionaryAgencyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  MissionaryAgency   MissionaryAgency @relation("belongs_to", fields: [missionaryAgencyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  MissionaryAgencyOwner MissionaryAgency[] @relation("created_by")
 
   userId Int  @unique @map("user_id")
   User   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  Post Post[] @relation()
+  Address     Address?
+  WorkAddress WorkAddress?
+  Post        Post[]       @relation()
 
   @@map("missionaries")
+}
+
+model WorkAddress {
+  id       Int    @id @default(autoincrement())
+  district String
+  city     String
+  state    String
+  country  String
+
+  missionaryId Int        @unique
+  Missionary   Missionary @relation(fields: [missionaryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("work_addresses")
+}
+
+model Address {
+  id       Int    @id @default(autoincrement())
+  zip      String
+  district String
+  city     String
+  state    String
+  country  String
+
+  missionaryId Int        @unique
+  Missionary   Missionary @relation(fields: [missionaryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("addresses")
 }
 
 model Follow {
@@ -125,7 +170,10 @@ model MissionaryAgency {
   phoneNumber String?
   createdAt   DateTime @default(now()) @map("created_at")
 
-  Missionary Missionary[] @relation()
+  missionaryId          Int?        @map("missionary_id")
+  MissionaryAgencyOwner Missionary? @relation("created_by", fields: [missionaryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  Missionary Missionary[] @relation("belongs_to")
 
   @@map("missionary_agencies")
 }
