@@ -45,6 +45,31 @@ services:
       timeout: 5s
       retries: 5
 
+  elasticsearch:
+    image: elasticsearch:9.1.5@sha256:9dac882b67afe5161f8988a7ede0e9890145182af83e4e1d4d10631c2f66656f
+    container_name: ${ELASTICSEARCH_CONTAINER_NAME:-elasticsearch}
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+
+      - ELASTIC_USERNAME=${ELASTIC_USERNAME}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      # - xpack.security.enabled=true
+      # - xpack.security.http.ssl.enabled=true
+      # - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certs/elasticsearch.key
+      # - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certs/elasticsearch.crt
+      # - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certs/ca.crt
+
+    ports:
+      - ${ELASTICSEARCH_PORT:-9200}:9200
+      # - "9300:9300"
+
+    volumes:
+      - elasticsearch_data:/elasticsearch
+      - ./certs:/usr/share/elasticsearch/config/certs  # Certificados TLS
+      - ./es_snapshots:/usr/share/elasticsearch/snapshots  # Snapshot local (S3/Cloud pode ser configurado depois)
+
+
   # backend:
   #   env_file: .env
   #   build:
@@ -72,6 +97,8 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  elasticsearch_data:
     driver: local
   # backend_uploads:
   #   driver: local
