@@ -1,6 +1,6 @@
 import type { AuthenticationAudit, Prisma } from '@prisma/client'
 
-export interface AuthenticationAuditRepository {
+export interface AuthenticationAuditsRepository {
   create: (
     data: Prisma.AuthenticationAuditUncheckedCreateInput,
   ) => Promise<AuthenticationAudit>

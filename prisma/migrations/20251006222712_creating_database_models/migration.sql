@@ -1,59 +1,50 @@
-/*
-  Warnings:
-
-  - The primary key for the `users` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - You are about to drop the column `password_digest` on the `users` table. All the data in the column will be lost.
-  - The `id` column on the `users` table would be dropped and recreated. This will lead to data loss if there is data in the column.
-  - You are about to drop the `authentication_audit` table. If the table is not empty, all the data it contains will be lost.
-  - A unique constraint covering the columns `[public_id]` on the table `users` will be added. If there are existing duplicate values, this will fail.
-  - Added the required column `password_hash` to the `users` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `phone_number` to the `users` table without a default value. This is not possible if the table is not empty.
-  - The required column `public_id` was added to the `users` table with a prisma-level default value. This is not possible if the table is not empty. Please add this column as optional, then populate it before making it required.
-  - Added the required column `user_role` to the `users` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `username` to the `users` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateEnum
-CREATE TYPE "public"."AuthenticationStatus" AS ENUM ('SUCCESS', 'USER_NOT_EXISTS', 'INCORRECT_PASSWORD', 'BLOCKED');
+CREATE TYPE "public"."AuthenticationStatusType" AS ENUM ('SUCCESS', 'USER_NOT_EXISTS', 'INCORRECT_PASSWORD', 'BLOCKED');
 
 -- CreateEnum
-CREATE TYPE "public"."UserRole" AS ENUM ('ADMIN', 'MISSIONARY', 'NORMAL_USER');
+CREATE TYPE "public"."UserRoleType" AS ENUM ('ADMIN', 'MISSIONARY', 'DEFAULT');
 
--- DropForeignKey
-ALTER TABLE "public"."authentication_audit" DROP CONSTRAINT "authentication_audit_user_id_fkey";
+-- CreateEnum
+CREATE TYPE "public"."IdentityType" AS ENUM ('CPF', 'PASSPORT');
 
--- AlterTable
-ALTER TABLE "public"."users" DROP CONSTRAINT "users_pkey",
-DROP COLUMN "password_digest",
-ADD COLUMN     "biography" TEXT,
-ADD COLUMN     "faith_community_id" INTEGER,
-ADD COLUMN     "password_hash" TEXT NOT NULL,
-ADD COLUMN     "phone_number" TEXT NOT NULL,
-ADD COLUMN     "profile_picture" TEXT,
-ADD COLUMN     "public_id" TEXT NOT NULL,
-ADD COLUMN     "user_role" "public"."UserRole" NOT NULL,
-ADD COLUMN     "username" TEXT NOT NULL,
-DROP COLUMN "id",
-ADD COLUMN     "id" SERIAL NOT NULL,
-ADD CONSTRAINT "users_pkey" PRIMARY KEY ("id");
-
--- DropTable
-DROP TABLE "public"."authentication_audit";
-
--- DropEnum
-DROP TYPE "public"."AUTHENTICATION_STATUS";
+-- CreateEnum
+CREATE TYPE "public"."GenderType" AS ENUM ('MALE', 'FEMALE');
 
 -- CreateTable
 CREATE TABLE "public"."authentication_audits" (
     "id" SERIAL NOT NULL,
-    "ip_address" TEXT,
+    "ip_address" INET,
     "remote_port" TEXT,
     "browser" TEXT,
-    "status" "public"."AuthenticationStatus" NOT NULL,
-    "userId" INTEGER,
+    "status" "public"."AuthenticationStatusType" NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "user_id" INTEGER,
 
     CONSTRAINT "authentication_audits_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."users" (
+    "id" SERIAL NOT NULL,
+    "public_id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "phone_number" TEXT NOT NULL,
+    "profile_picture" TEXT,
+    "biography" TEXT,
+    "role" "public"."UserRoleType" NOT NULL DEFAULT 'DEFAULT',
+    "gender" "public"."GenderType",
+    "followers_count" INTEGER NOT NULL DEFAULT 0,
+    "following_count" INTEGER NOT NULL DEFAULT 0,
+    "email" TEXT NOT NULL,
+    "password_hash" TEXT NOT NULL,
+    "login_attempts" INTEGER NOT NULL DEFAULT 0,
+    "last_login" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "faith_community_id" INTEGER,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -61,10 +52,38 @@ CREATE TABLE "public"."missionaries" (
     "id" SERIAL NOT NULL,
     "public_email" TEXT,
     "public_phone" TEXT,
+    "identity_type" "public"."IdentityType",
+    "identity_document" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "missionaryAgencyId" INTEGER NOT NULL,
     "user_id" INTEGER NOT NULL,
 
     CONSTRAINT "missionaries_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."work_addresses" (
+    "id" SERIAL NOT NULL,
+    "district" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "state" TEXT NOT NULL,
+    "country" TEXT NOT NULL,
+    "missionaryId" INTEGER NOT NULL,
+
+    CONSTRAINT "work_addresses_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."addresses" (
+    "id" SERIAL NOT NULL,
+    "zip" TEXT NOT NULL,
+    "district" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "state" TEXT NOT NULL,
+    "country" TEXT NOT NULL,
+    "missionaryId" INTEGER NOT NULL,
+
+    CONSTRAINT "addresses_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -91,7 +110,9 @@ CREATE TABLE "public"."faith_communities" (
 CREATE TABLE "public"."missionary_agencies" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "phoneNumber" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "missionary_id" INTEGER,
 
     CONSTRAINT "missionary_agencies_pkey" PRIMARY KEY ("id")
 );
@@ -101,6 +122,7 @@ CREATE TABLE "public"."pastors" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "phone_number" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "faithCommunityId" INTEGER NOT NULL,
 
     CONSTRAINT "pastors_pkey" PRIMARY KEY ("id")
@@ -122,13 +144,29 @@ CREATE TABLE "public"."post_images" (
     "id" SERIAL NOT NULL,
     "imageURL" TEXT NOT NULL,
     "order" INTEGER NOT NULL DEFAULT 0,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "post_id" INTEGER NOT NULL,
 
     CONSTRAINT "post_images_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "users_public_id_key" ON "public"."users"("public_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_username_key" ON "public"."users"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "public"."users"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "missionaries_user_id_key" ON "public"."missionaries"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "work_addresses_missionaryId_key" ON "public"."work_addresses"("missionaryId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "addresses_missionaryId_key" ON "public"."addresses"("missionaryId");
 
 -- CreateIndex
 CREATE INDEX "followers_following_id_idx" ON "public"."followers"("following_id");
@@ -142,11 +180,8 @@ CREATE INDEX "posts_missionary_id_created_at_idx" ON "public"."posts"("missionar
 -- CreateIndex
 CREATE INDEX "post_images_post_id_idx" ON "public"."post_images"("post_id");
 
--- CreateIndex
-CREATE UNIQUE INDEX "users_public_id_key" ON "public"."users"("public_id");
-
 -- AddForeignKey
-ALTER TABLE "public"."authentication_audits" ADD CONSTRAINT "authentication_audits_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "public"."authentication_audits" ADD CONSTRAINT "authentication_audits_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."users" ADD CONSTRAINT "users_faith_community_id_fkey" FOREIGN KEY ("faith_community_id") REFERENCES "public"."faith_communities"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -158,6 +193,12 @@ ALTER TABLE "public"."missionaries" ADD CONSTRAINT "missionaries_missionaryAgenc
 ALTER TABLE "public"."missionaries" ADD CONSTRAINT "missionaries_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."work_addresses" ADD CONSTRAINT "work_addresses_missionaryId_fkey" FOREIGN KEY ("missionaryId") REFERENCES "public"."missionaries"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."addresses" ADD CONSTRAINT "addresses_missionaryId_fkey" FOREIGN KEY ("missionaryId") REFERENCES "public"."missionaries"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."followers" ADD CONSTRAINT "followers_follower_id_fkey" FOREIGN KEY ("follower_id") REFERENCES "public"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -167,7 +208,10 @@ ALTER TABLE "public"."followers" ADD CONSTRAINT "followers_following_id_fkey" FO
 ALTER TABLE "public"."faith_communities" ADD CONSTRAINT "faith_communities_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."pastors" ADD CONSTRAINT "pastors_faithCommunityId_fkey" FOREIGN KEY ("faithCommunityId") REFERENCES "public"."faith_communities"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "public"."missionary_agencies" ADD CONSTRAINT "missionary_agencies_missionary_id_fkey" FOREIGN KEY ("missionary_id") REFERENCES "public"."missionaries"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."pastors" ADD CONSTRAINT "pastors_faithCommunityId_fkey" FOREIGN KEY ("faithCommunityId") REFERENCES "public"."faith_communities"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."posts" ADD CONSTRAINT "posts_missionary_id_fkey" FOREIGN KEY ("missionary_id") REFERENCES "public"."missionaries"("id") ON DELETE CASCADE ON UPDATE CASCADE;

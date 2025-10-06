@@ -1,7 +1,7 @@
 import type { User } from '@prisma/client'
-import type { AuthenticationAuditsRepository } from '@repositories/authentication-audits-repository'
+import type { AuthenticationAuditsRepository } from '@repositories/authentication-audit-repository'
 import type { UsersRepository } from '@repositories/users-repository'
-import { emailSchema } from '@schemas/utils/components/email-schema'
+import { emailSchema } from '@schemas/utils/utils/components/email-schema'
 import { compare } from 'bcryptjs'
 import { InvalidCredentialsError } from '../errors/user/invalid-credentials-error'
 

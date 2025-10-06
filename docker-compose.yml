@@ -1,7 +1,7 @@
 services:
   postgres:
     image: bitnamilegacy/postgresql:17.6.0-debian-12-r4@sha256:926356130b77d5742d8ce605b258d35db9b62f2f8fd1601f9dbaef0c8a710a8d
-    container_name: postgres
+    container_name: ${POSTGRES_CONTAINER_NAME:-postgres}
     restart: on-failure:5
     environment:
       - POSTGRESQL_USERNAME=${POSTGRES_USERNAME}
@@ -23,7 +23,7 @@ services:
 
   redis:
     image: bitnamilegacy/redis:8.2.1-debian-12-r0@sha256:25bf63f3caf75af4628c0dfcf39859ad1ac8abe135be85e99699f9637b16dc28
-    container_name: redis
+    container_name: ${REDIS_CONTAINER_NAME:-redis}
     restart: on-failure:5
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}

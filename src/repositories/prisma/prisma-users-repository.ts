@@ -1,7 +1,7 @@
+import { prisma } from '@lib/prisma'
 import type { Prisma } from '@prisma/client'
 import { userWithDetails } from 'src/@types/user-with-details'
-import type { UsersRepository } from '../users-repository'
-import { prisma } from '@/lib/prisma'
+import type { FindByEmailOrUsernameQuery, UsersRepository } from '../users-repository'
 
 export class PrismaUsersRepository implements UsersRepository {
   async findById(id: number) {
@@ -9,7 +9,6 @@ export class PrismaUsersRepository implements UsersRepository {
       where: { id },
       include: userWithDetails.include,
     })
-
     return user
   }
 
@@ -18,40 +17,29 @@ export class PrismaUsersRepository implements UsersRepository {
       where: { publicId },
       include: userWithDetails.include,
     })
-
     return user
   }
 
-  async findByEmailOrUsername(
-    emailOrUsername: string,
-    usernameOrEmail?: string,
-  ) {
-    const orConditions: Array<{ email?: string; username?: string }> = [
-      { email: emailOrUsername },
-      { username: emailOrUsername },
-    ]
-
-    if (usernameOrEmail !== undefined && usernameOrEmail !== emailOrUsername) {
-      orConditions.push({ email: usernameOrEmail })
-      orConditions.push({ username: usernameOrEmail })
-    }
-
+  async findByEmailOrUsername({ email, username }: FindByEmailOrUsernameQuery) {
     const user = await prisma.user.findFirst({
       where: {
-        OR: orConditions,
+        OR: [{ email }, { username }],
       },
-      include: userWithDetails.include,
     })
-
     return user
   }
 
   async findByEmail(email: string) {
     const user = await prisma.user.findUnique({
       where: { email },
-      include: userWithDetails.include,
     })
+    return user
+  }
 
+  async findByUsername(username: string) {
+    const user = await prisma.user.findUnique({
+      where: { username },
+    })
     return user
   }
 
@@ -71,7 +59,6 @@ export class PrismaUsersRepository implements UsersRepository {
       data,
       include: userWithDetails.include,
     })
-
     return user
   }
 
