@@ -2,3 +2,7 @@ node_modules
 build
 .gitignore
 .env
+
+# Logs:
+logs/*
+!logs/.gitkeep

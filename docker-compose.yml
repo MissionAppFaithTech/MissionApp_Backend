@@ -1,15 +1,81 @@
 services:
-  db:
-    image: bitnami/postgresql:latest
-    restart: always
+  postgres:
+    image: bitnamilegacy/postgresql:17.6.0-debian-12-r4@sha256:926356130b77d5742d8ce605b258d35db9b62f2f8fd1601f9dbaef0c8a710a8d
+    container_name: postgres
+    restart: on-failure:5
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DATABASE=backend
+      - POSTGRESQL_USERNAME=${POSTGRES_USERNAME}
+      - POSTGRESQL_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRESQL_DATABASE=${POSTGRES_DB}
+      - POSTGRESQL_PORT_NUMBER=5432
     ports:
-      - '5432:5432'
+      - ${POSTGRES_PORT:-5432}:5432
     volumes:
-      - db:/var/lib/postgresql/data
+      - postgres_data:/bitnami/postgresql
+    # networks:
+    #   - app-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  redis:
+    image: bitnamilegacy/redis:8.2.1-debian-12-r0@sha256:25bf63f3caf75af4628c0dfcf39859ad1ac8abe135be85e99699f9637b16dc28
+    container_name: redis
+    restart: on-failure:5
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_MAXMEMORY_POLICY=noeviction
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+      - REDIS_MAXMEMORY=512mb
+      - REDIS_PORT_NUMBER=6379
+      - REDIS_AOF_ENABLED=yes
+      - REDIS_DATABASES=16
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    volumes:
+      - redis_data:/bitnami/redis
+    # networks:
+    #   - app-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # backend:
+  #   env_file: .env
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: ${COMMAND}
+  #   restart: on-failure:5
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   ports:
+  #     - ${APP_PORT:-3000}:3000
+  #   volumes:
+  #     - ./src:/app/src
+  #     - ./prisma:/app/prisma
+  #     - /app/node_modules
+  #     - backend_uploads:/usr/src/app/uploads
+  #   networks:
+  #     - app-network
+
+
 volumes:
-  db:
+  postgres_data:
     driver: local
+  redis_data:
+    driver: local
+  # backend_uploads:
+  #   driver: local
+
+# networks:
+#   app-network:
+#     driver: bridge

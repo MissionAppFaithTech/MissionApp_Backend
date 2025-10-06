@@ -1,4 +1,4 @@
-# Mission App - ⛪
+# Mission App ⛪
 
 ## 📋 Sumário:
 
