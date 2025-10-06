@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client'
 import { faithCommunityData_1 } from './seed-data/faith-communities'
 import { pastorData_1 } from './seed-data/pastors'
 import { userData_1 } from './seed-data/users'
+import { missionaryAgencyData_1 } from './seed-data/missionary-agencies'
+import { missionaryData_1 } from './seed-data/missionaries'
 
 const prisma = new PrismaClient()
 
@@ -37,36 +39,27 @@ async function main() {
     update: {},
     create: {
       ...userData_1,
-      faithCommunityId: 1,
+      faithCommunityId: faithCommunity.id,
     },
   })
 
   // Criação da MissionaryAgency:
-  const missionaryAgencyData = {
-    name: 'Agência de Missionários',
-  }
-
   let missionaryAgency = await prisma.missionaryAgency.findFirst({
-    where: missionaryAgencyData,
+    where: missionaryAgencyData_1,
   })
 
-  if (missionaryAgency === null) {
+  if (!missionaryAgency) {
     missionaryAgency = await prisma.missionaryAgency.create({
-      data: missionaryAgencyData,
+      data: missionaryAgencyData_1,
     })
   }
 
   // Adicionando informações de Missionary ao User:
-  const missionaryData = {
-    publicEmail: 'missionApp-missionary@email.com',
-    publicPhoneNumber: '+55 21 98765-4321',
-  }
-
   await prisma.missionary.upsert({
     where: { userId: user.id },
     update: { userId: user.id },
     create: {
-      ...missionaryData,
+      ...missionaryData_1,
       userId: user.id,
       missionaryAgencyId: missionaryAgency.id,
     },
