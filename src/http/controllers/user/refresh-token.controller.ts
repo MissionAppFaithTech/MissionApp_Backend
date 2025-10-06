@@ -13,7 +13,6 @@ export async function refreshToken(request: FastifyRequest, reply: FastifyReply)
 
   const tokenPayload = {
     role: request.user.role,
-    status: request.user.status,
   }
 
   const accessToken = await reply.jwtSign(tokenPayload, {

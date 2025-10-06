@@ -23,7 +23,6 @@ export async function authenticate(request: FastifyRequest, reply: FastifyReply)
 
   const tokenPayload = {
     role: user.role,
-    status: user.membershipStatus,
   }
 
   const accessToken = await reply.jwtSign(tokenPayload, {
