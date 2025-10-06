@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client'
 import { faithCommunityData_1 } from './seed-data/faith-communities'
+import { missionaryData_1 } from './seed-data/missionaries'
+import { missionaryAgencyData_1 } from './seed-data/missionary-agencies'
 import { pastorData_1 } from './seed-data/pastors'
 import { userData_1 } from './seed-data/users'
-import { missionaryAgencyData_1 } from './seed-data/missionary-agencies'
-import { missionaryData_1 } from './seed-data/missionaries'
 
 const prisma = new PrismaClient()
 
