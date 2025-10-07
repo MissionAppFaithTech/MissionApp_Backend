@@ -1,45 +1,71 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@lib/prisma'
 import type { Prisma } from '@prisma/client'
-import type { IChangePassword, UsersRepository } from '../users-repository'
+import { userWithDetails } from 'src/@types/user-with-details'
+import type { FindByEmailOrUsernameQuery, UsersRepository } from '../users-repository'
 
 export class PrismaUsersRepository implements UsersRepository {
-  async findByEmail(email: string) {
+  async findById(id: number) {
     const user = await prisma.user.findUnique({
+      where: { id },
+      include: userWithDetails.include,
+    })
+    return user
+  }
+
+  async findByPublicId(publicId: string) {
+    const user = await prisma.user.findUnique({
+      where: { publicId },
+      include: userWithDetails.include,
+    })
+    return user
+  }
+
+  async findByEmailOrUsername({ email, username }: FindByEmailOrUsernameQuery) {
+    const user = await prisma.user.findFirst({
       where: {
-        email,
+        OR: [{ email }, { username }],
       },
     })
-
     return user
+  }
+
+  async findByEmail(email: string) {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    })
+    return user
+  }
+
+  async findByUsername(username: string) {
+    const user = await prisma.user.findUnique({
+      where: { username },
+    })
+    return user
+  }
+
+  async incrementLoginAttempts(id: number) {
+    await prisma.user.update({
+      where: { id },
+      data: {
+        loginAttempts: {
+          increment: 1,
+        },
+      },
+    })
   }
 
   async create(data: Prisma.UserCreateInput) {
     const user = await prisma.user.create({
       data,
+      include: userWithDetails.include,
     })
-
     return user
   }
 
-  async setLastLogin(id: string) {
+  async setLastLogin(id: number) {
     await prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        last_login: new Date(),
-      },
+      where: { id },
+      data: { lastLogin: new Date() },
     })
-  }
-
-  async changePassword({ email, password_digest }: IChangePassword) {
-    const user = await prisma.user.update({
-      where: { email },
-      data: {
-        password_digest,
-      },
-    })
-
-    return user
   }
 }

@@ -13,85 +13,207 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum AUTHENTICATION_STATUS {
+model AuthenticationAudit {
+  id         Int                      @id @default(autoincrement())
+  ipAddress  String?                  @map("ip_address") @db.Inet
+  remotePort String?                  @map("remote_port")
+  browser    String?
+  status     AuthenticationStatusType
+  createdAt  DateTime                 @default(now()) @map("created_at")
+  userId     Int?                     @map("user_id")
+  user       User?                    @relation(fields: [userId], references: [id])
+
+  @@map("authentication_audits")
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  publicId       String   @unique @default(uuid(7)) @map("public_id")
+  name           String
+  username       String   @unique
+  phoneNumber    String   @map("phone_number")
+  profilePicture String?  @map("profile_picture")
+  biography      String?
+  role           UserRoleType @default(DEFAULT)
+  gender         GenderType?
+
+  // Cache para recuperação da quantidade de seguidores mais rápido:
+  followersCount Int @default(0) @map("followers_count")
+  followingCount Int @default(0) @map("following_count")
+
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  loginAttempts Int       @default(0) @map("login_attempts")
+  lastLogin     DateTime? @map("last_login")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  faithCommunityId Int?            @map("faith_community_id")
+  FaithCommunity   FaithCommunity? @relation("belongs_to", fields: [faithCommunityId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  Missionary          Missionary?           @relation()
+  Following           Follow[]              @relation("following")
+  Followers           Follow[]              @relation("followers")
+  FaithCommunityOwner FaithCommunity[]      @relation("created_by")
+  AuthenticationAudit AuthenticationAudit[] @relation()
+
+  @@map("users")
+}
+
+model Missionary {
+  id                Int           @id @default(autoincrement())
+  publicEmail       String?       @map("public_email")
+  publicPhoneNumber String?       @map("public_phone")
+  // status
+  identityType      IdentityType? @map("identity_type")
+  identityDocument  String?       @map("identity_document")
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  missionaryAgencyId Int
+  MissionaryAgency   MissionaryAgency @relation("belongs_to", fields: [missionaryAgencyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  MissionaryAgencyOwner MissionaryAgency[] @relation("created_by")
+
+  userId Int  @unique @map("user_id")
+  User   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  Address     Address?
+  WorkAddress WorkAddress?
+  Post        Post[]       @relation()
+
+  @@map("missionaries")
+}
+
+model WorkAddress {
+  id       Int    @id @default(autoincrement())
+  district String
+  city     String
+  state    String
+  country  String
+
+  missionaryId Int        @unique
+  Missionary   Missionary @relation(fields: [missionaryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("work_addresses")
+}
+
+model Address {
+  id       Int    @id @default(autoincrement())
+  zip      String
+  district String
+  city     String
+  state    String
+  country  String
+
+  missionaryId Int        @unique
+  Missionary   Missionary @relation(fields: [missionaryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("addresses")
+}
+
+model Follow {
+  followerId  Int      @map("follower_id")
+  followingId Int      @map("following_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  Follower  User @relation("following", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Following User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+  @@index([followerId])
+  @@map("followers")
+}
+
+model FaithCommunity {
+  id          Int      @id @default(autoincrement())
+  name        String
+  phoneNumber String   @map("phone_number")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  userId Int?  @map("user_id")
+  User   User? @relation("created_by", fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  Members User[]   @relation("belongs_to")
+  Pastor  Pastor[] @relation("is_part_of")
+
+  @@map("faith_communities")
+}
+
+model MissionaryAgency {
+  id          Int      @id @default(autoincrement())
+  name        String
+  phoneNumber String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  missionaryId          Int?        @map("missionary_id")
+  MissionaryAgencyOwner Missionary? @relation("created_by", fields: [missionaryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  Missionary Missionary[] @relation("belongs_to")
+
+  @@map("missionary_agencies")
+}
+
+model Pastor {
+  id          Int      @id @default(autoincrement())
+  name        String
+  phoneNumber String   @map("phone_number")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  faithCommunityId Int
+  FaithCommunity   FaithCommunity @relation("is_part_of", fields: [faithCommunityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("pastors")
+}
+
+model Post {
+  id            Int      @id @default(autoincrement())
+  content       String   @db.Text
+  highlightLink String?  @map("highlight_link")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  missionaryId Int        @map("missionary_id")
+  Missionary   Missionary @relation(fields: [missionaryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  PostImage PostImage[] @relation()
+
+  @@index([missionaryId, createdAt])
+  @@map("posts")
+}
+
+model PostImage {
+  id        Int      @id @default(autoincrement())
+  imageURL  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  postId Int  @map("post_id")
+  Post   Post @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([postId])
+  @@map("post_images")
+}
+
+enum AuthenticationStatusType {
   SUCCESS
   USER_NOT_EXISTS
   INCORRECT_PASSWORD
   BLOCKED
 }
 
-// missionario, usuario e administrador
-model User {
-  id             String  @id @default(uuid())
-  bio            String
-  fullName       String
-  phoneNumber    String
-  username       String
-  publicEmail    String?
-  publicPhone    String?
-  profilePicture String?
-
-  email           String    @unique
-  password_digest String
-  login_attempts  Int       @default(0)
-  last_login      DateTime?
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  roleId String
-  Role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-
-  missionaryAgencyId String
-  MissionaryAgency   MissionaryAgency @relation(fields: [missionaryAgencyId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-
-  churchId String?
-  Church   Church? @relation(fields: [churchId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-
-  AuthenticationAudit AuthenticationAudit[]
-
-  @@map("users")
+enum UserRoleType {
+  ADMIN
+  MISSIONARY
+  DEFAULT
 }
 
-model MissionaryAgency {
-  id         String @id @default(uuid())
-  agencyName String
-
-  User User[]
-
-  @@map("missionary_agency")
+enum IdentityType {
+  CPF
+  PASSPORT
 }
 
-model Church {
-  id          String  @id @default(uuid())
-  name        String
-  churchPhone String?
-
-  // TODO: revisar consistência de attendedBy
-  attendedBy String // userId from the missionary
-  // User       User   @relation(fields: [attendedBy], references: [id], onDelete: NoAction, onUpdate: Cascade)
-
-  User User[]
-
-  @@map("church")
-}
-
-model Role {
-  id   String @id @default(uuid())
-  role String
-
-  User User[]
-}
-
-model AuthenticationAudit {
-  id          Int                   @id @default(autoincrement())
-  ip_address  String?
-  remote_port String?
-  browser     String?
-  status      AUTHENTICATION_STATUS
-  user_id     String?
-  user        User?                 @relation(fields: [user_id], references: [id], onDelete: NoAction)
-  created_at  DateTime              @default(now())
-
-  @@map("authentication_audit")
+enum GenderType {
+  MALE
+  FEMALE
 }

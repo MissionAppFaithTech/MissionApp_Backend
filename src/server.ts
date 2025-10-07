@@ -1,11 +1,12 @@
+import { logger } from '@lib/logger'
 import { app } from './app'
-import 'dotenv/config'
+import { env } from './env'
 
 app
   .listen({
     host: '0.0.0.0',
-    port: process.env.PORT,
+    port: env.APP_PORT,
   })
-  .then(() => {
-    console.log('🚀 Server is running! 🚀')
+  .then((server) => {
+    logger.info(`Server started successfully! Listening on: ${server}`)
   })
