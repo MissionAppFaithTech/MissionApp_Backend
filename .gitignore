@@ -6,6 +6,3 @@ build
 # Logs:
 logs/*
 !logs/.gitkeep
-
-# ES:
-es_snapshots
