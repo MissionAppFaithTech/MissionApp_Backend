@@ -1,8 +1,7 @@
 
-import type { UserWithDetails } from '@custom-types/user-with-details'
-import type { UserRoleType } from '@prisma/client'
+import type { User, UserRoleType } from '@prisma/client'
 
-interface HTTPUserDetails {
+interface HTTPUser {
   id: string
   name: string
   username: string
@@ -15,34 +14,30 @@ interface HTTPUserDetails {
   followingCount: number
 }
 
-interface HTTPMissionary {
-  publicEmail: string | null | undefined
-  publicPhoneNumber: string | null | undefined
-  missionaryAgencyName: string
-}
+// interface HTTPMissionary {
+//   publicEmail: string | null | undefined
+//   publicPhoneNumber: string | null | undefined
+//   missionaryAgencyName: string
+// }
 
-interface HTTPFaithCommunity {
-  name: string
-  phoneNumber: string
-}
+// interface HTTPFaithCommunity {
+//   name: string
+//   phoneNumber: string
+// }
 
-interface HTTPUser {
-  user: HTTPUserDetails
-  missionary: HTTPMissionary | null
-  faithCommunity: HTTPFaithCommunity | null
-}
+// interface HTTPUser {
+//   user: HTTPUserDetails
+// }
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class UserPresenter {
-  static toHTTP(user: UserWithDetails): HTTPUser
-  static toHTTP(users: UserWithDetails[]): HTTPUser[]
-  static toHTTP(input: UserWithDetails | UserWithDetails[]): HTTPUser | HTTPUser[] {
+  static toHTTP(user: User): HTTPUser
+  static toHTTP(users: User[]): HTTPUser[]
+  static toHTTP(input: User | User[]): HTTPUser | HTTPUser[] {
     if (Array.isArray(input)) {
       return input.map((user) => this.toHTTP(user))
     }
 
     return {
-      user: {
         id: input.publicId,
         name: input.name,
         username: input.username,
@@ -53,24 +48,6 @@ export class UserPresenter {
         profilePicture: input.profilePicture,
         followersCount: input.followersCount,
         followingCount: input.followingCount,
-      },
-
-      missionary:
-        input.Missionary !== null
-          ? {
-              publicEmail: input.Missionary?.publicEmail,
-              publicPhoneNumber: input.Missionary?.publicPhoneNumber,
-              missionaryAgencyName: input.Missionary.MissionaryAgency.name,
-            }
-          : null,
-
-      faithCommunity:
-        input.FaithCommunity !== null
-          ? {
-              name: input.FaithCommunity.name,
-              phoneNumber: input.FaithCommunity.phoneNumber,
-            }
-          : null,
     }
   }
 }
