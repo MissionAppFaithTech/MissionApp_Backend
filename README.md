@@ -34,6 +34,9 @@ Neste projeto consta o backend recriado para o sistema do projeto MissionAPP.
 ├─── .vscode
 ├─── logs
 ├─── prisma
+│    ├─── seed-data
+│    └─── migrations
+│         └─── ...
 └─── src
      ├─── @types
      ├─── constants
@@ -42,12 +45,19 @@ Neste projeto consta o backend recriado para o sistema do projeto MissionAPP.
      │    ├─── controllers
      │    │    └─── users
      │    ├─── middlewares
+     │    ├─── plugins
+     │    ├─── presenters
      │    └─── schemas
-     │         ├───users
-     │         └───utils
+     │         ├─── users
+     │         └─── utils
+     │              ├─── components
+     │              ├─── enums
+     │              └─── primitives
      ├─── lib
+     │    ├─── async-local-storage
      │    ├─── logger
-     │    └─── prisma
+     │    ├─── prisma
+     │    └─── redis
      ├─── repositories
      │    └─── prisma
      ├─── templates
