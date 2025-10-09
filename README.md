@@ -8,8 +8,8 @@
 4. [Funcionalidades por Requisito](#funcionalidades-por-requisito)
 5. [Requisitos Não Funcionais](#requisitos-nao-funcionais)
 6. [Casos de Uso Principais](#casos-de-uso-principais)
-7. [Requisitos](#requisitos)
-8. [Versões Utilizadas](#versoes-utilizadas)
+7. [Ferramentas Necessárias](#ferramentas necessárias)
+8. [Versões de Tecnologias Utilizadas](#versoes-de-tecnologias-utilizadas)
 9. [Como Executar o Servidor](#como-executar-o-servidor)
 10. [Links Externos](#links-externos)
 11. [Equipe de Desenvolvimento](#equipe-de-desenvolvimento)
@@ -126,24 +126,26 @@ Neste projeto consta o backend recriado para o sistema do projeto MissionAPP.
 
 ---
 
-<a name="requisitos"></a>
+<a name="ferramentas necessárias"></a>
 
-## ✔️ Requisitos:
+## ✔️ Ferramentas Necessárias:
 Certifique-se de que você tenha os seguintes softwares instalados antes de continuar:
 
+- [Node.js](https://nodejs.org/) (versão mínima: 18.x)
+- [NPM](https://www.npmjs.com/) (versão mínima: 9.x)
 - [Docker](https://www.docker.com/) (versão mínima: 20.10)
 - [Docker Compose](https://docs.docker.com/compose/) (versão mínima: 1.29)
 
 ---
 
-<a name="versoes-utilizadas"></a>
+<a name="versoes-de-tecnologias-utilizadas"></a>
 
-## ⚙️ Versões Utilizadas:
+## ⚙️ Versões de Tecnologias Utilizadas:
 - **Node.js**: 22.19.0
-- **PostgreSQL**: 3.22.0 (alpine)
+- **PostgreSQL**: 13.12 (alpine)
 - **Prisma**: 6.16.3
-- **Redis**: 8.2.1
-- **ElasticSearch**: 9.1.4
+- **Redis**: 7.2.11 (alpine)
+- **ElasticSearch**: 9.1.5
 
 ---
 
@@ -212,5 +214,5 @@ npm run start:dev
 ## 👥 Equipe de Desenvolvimento:
 
 - **Dev Backend**: <a href="https://github.com/Amaro-peter" target="_blank">Pedro Amaro</a>
-- **Dev Backend**: <a href="https://github.com/AllanaOliveira" target="_blank">Allana Oliveira</a>
+- **Dev Backend**: <a href="https://github.com/allanacaoliveira" target="_blank">Allana Oliveira</a>
 - **Dev Backend**: <a href="https://github.com/AFSFerreira" target="_blank">Allber Ferreira</a>
