@@ -22,6 +22,7 @@ export default class extends BaseSchema {
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')
+        .onUpdate('CASCADE')
     })
   }
 

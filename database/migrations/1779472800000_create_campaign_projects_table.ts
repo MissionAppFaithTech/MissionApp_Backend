@@ -6,11 +6,11 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary()
+      table.timestamp('created_at', { precision: 3, useTz: true }).notNullable()
 
       table.uuid('campaign_id').notNullable()
-      table.uuid('project_id').notNullable()
 
-      table.timestamp('added_at', { precision: 3, useTz: true }).notNullable()
+      table.uuid('project_id').notNullable()
 
       table
         .foreign('campaign_id', 'fk_campaign_projects_campaign_id')

@@ -12,6 +12,13 @@ export default class extends BaseSchema {
 
       table.uuid('missionary_id').nullable()
 
+      table
+        .foreign('missionary_id')
+        .references('id')
+        .inTable('missionaries')
+        .onDelete('SET NULL')
+        .onUpdate('CASCADE')
+
       table.index(['name'], 'idx_missionary_agencies_name')
       table.index(['missionary_id'], 'idx_missionary_agencies_missionary_id')
     })

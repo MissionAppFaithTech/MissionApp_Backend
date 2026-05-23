@@ -7,8 +7,10 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary()
+
       table.string('pix_key').nullable()
       table.string('qr_code_url').nullable()
+
       table.string('bank_name').nullable()
       table.string('bank_number').nullable()
       table.string('agency').nullable()
@@ -17,10 +19,10 @@ export default class extends BaseSchema {
       table.string('holder_name').nullable()
       table.string('holder_document').nullable()
 
-      table.uuid('missionary_id').notNullable()
-
       table.timestamp('created_at', { precision: 3, useTz: true }).notNullable()
-      table.timestamp('updated_at', { precision: 3, useTz: true }).nullable()
+      table.timestamp('updated_at', { precision: 3, useTz: true }).notNullable()
+
+      table.uuid('missionary_id').notNullable()
 
       table
         .foreign('missionary_id', 'fk_financial_configs_missionary_id')

@@ -13,7 +13,7 @@ export default class extends BaseSchema {
       table.string('username').notNullable()
       table.string('phone_number').notNullable()
       table.string('profile_picture').nullable()
-      table.string('biography').nullable()
+      table.text('biography').nullable()
 
       table
         .enum('membership_status', Object.values(MembershipStatus))
@@ -24,7 +24,7 @@ export default class extends BaseSchema {
       table.enum('role', Object.values(UserRole)).notNullable().defaultTo(UserRole.SUPPORTER)
       table.enum('gender', Object.values(Gender)).notNullable()
 
-      table.string('email', 254).notNullable()
+      table.string('email').notNullable()
       table.timestamp('email_verified_at', { precision: 3, useTz: true }).nullable()
       table.string('password_hash').notNullable()
 
@@ -44,7 +44,7 @@ export default class extends BaseSchema {
       table.timestamp('last_login', { precision: 3, useTz: true }).nullable()
 
       table.timestamp('created_at', { precision: 3, useTz: true }).notNullable()
-      table.timestamp('updated_at', { precision: 3, useTz: true }).nullable()
+      table.timestamp('updated_at', { precision: 3, useTz: true }).notNullable()
       table.timestamp('deleted_at', { precision: 3, useTz: true }).nullable()
 
       table.unique(['username'], { indexName: 'uq_users_username' })

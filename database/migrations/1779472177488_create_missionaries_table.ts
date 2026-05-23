@@ -14,11 +14,12 @@ export default class extends BaseSchema {
         .notNullable()
         .defaultTo(MissionaryStatus.PENDING_APPROVAL)
 
+      table.enum('identity_type', Object.values(IdentityType)).nullable()
+      table.string('identity_document').nullable()
+
       table.string('public_email').nullable()
       table.string('public_phone').nullable()
       table.text('donation_message').nullable()
-      table.enum('identity_type', Object.values(IdentityType)).nullable()
-      table.string('identity_document').nullable()
       table.timestamp('created_at', { precision: 3, useTz: true }).notNullable()
 
       table.uuid('user_id').notNullable()
