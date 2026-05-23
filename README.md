@@ -137,17 +137,17 @@ A plataforma reconhece **três perfis principais**, cada um com privilégios e r
     <tr>
       <td><code>ADMIN</code></td>
       <td>Provisionamento interno (DB) — sem auto-cadastro (Req 4.1)</td>
-      <td><strong>Gerenciamento global:</strong> Aprovação de missionários (Req 5), curadoria de projetos (Req 5.4), gestão de campanhas de promoção, controle de usuários. Acesso exclusivo ao painel administrativo com verificação explícita de role (Req 4.2).</td>
+      <td><strong>Gerenciamento global:</strong> Aprovação de missionários (Req 5), curadoria de projetos (Req 5.4), gestão de campanhas de promoção, controle de usuários.<br><br><strong>Acesso exclusivo:</strong> Painel administrativo com verificação explícita de role (Req 4.2).</td>
     </tr>
     <tr>
       <td><code>MISSIONARY</code></td>
       <td>Auto-cadastro + email verification + aprovação de admin (Req 3)</td>
-      <td><strong>Produção de conteúdo:</strong> Criar posts com imagens (Req 6), projetos de impacto com vídeo e capa (Req 7), campanhas de arrecadação. <strong>Gerenciamento financeiro:</strong> Configurar Pix, transferência bancária e futuros gateways (Req 9). <strong>Rede social:</strong> Seguir outros missionários, visualizar feeds de conexões (Req 14.4). Perfil expandido com agência missionária e dados eclesiásticos (Req 3.1.1).</td>
+      <td><strong>Produção de conteúdo:</strong> Criar posts com imagens (Req 6), projetos de impacto com vídeo e capa (Req 7), campanhas de arrecadação.<br><br><strong>Gerenciamento financeiro:</strong> Configurar Pix, transferência bancária e futuros gateways (Req 9).<br><br><strong>Rede social:</strong> Seguir outros missionários, visualizar feeds de conexões (Req 14.4). Perfil expandido com agência missionária e dados eclesiásticos (Req 3.1.1).</td>
     </tr>
     <tr>
       <td><code>SUPPORTER</code></td>
       <td>Auto-cadastro com dados básicos (Req 2.1) — opcional: criar/vincular comunidade de fé</td>
-      <td><strong>Consumo e apoio:</strong> Seguir missionários, visualizar feed de postagens, interagir com likes em posts (Req 5.4, 15.2.1). <strong>Descoberta:</strong> Explorar projetos recomendados (Req 12, 15.4.1), pesquisar missionários e projetos (Req 11). <strong>Doações:</strong> Realizar contribuições via Pix, transferência bancária e futuro gateway (Req 9). <strong>Acesso anônimo:</strong> Usuários não autenticados podem acessar rotas públicas em leitura (Req 1.4).</td>
+      <td><strong>Consumo e apoio:</strong> Seguir missionários, visualizar feed de postagens, interagir com likes em posts (Req 5.4, 15.2.1).<br><br><strong>Descoberta:</strong> Explorar projetos recomendados (Req 12, 15.4.1), pesquisar missionários e projetos (Req 11).<br><br><strong>Doações:</strong> Realizar contribuições via Pix, transferência bancária e futuro gateway (Req 9).<br><br><strong>Acesso anônimo:</strong> Usuários não autenticados podem acessar rotas públicas em leitura (Req 1.4).</td>
     </tr>
   </tbody>
 </table>
